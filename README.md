@@ -1,94 +1,89 @@
-# 🧪 Transition Delay Fault ATPG on 16×16 Multiplier
+# 🧪 Transition Fault ATPG and Timing-Aware Fault Coverage for Synthesized Multiplier
 
-This repository presents a complete flow of **DFT scan insertion**, **transition delay fault ATPG**, and **simulation validation** for a 16×16 unsigned multiplier using **Synopsys DC Shell, TetraMAX, and VCS**. The project demonstrates how to achieve full transition fault coverage and waveform verification through industry-standard EDA tools.
+This project performs **ATPG generation and timing-aware simulation** for a scan-inserted 16×16 multiplier using Synopsys tools including Design Compiler, TetraMAX, and VCS.
 
 ---
 
 ## 🔧 Tools Used
 
-* 🧱 **Design Compiler (DC Shell)** – RTL synthesis and scan insertion
-* 🧬 **TetraMAX** – ATPG and fault coverage analysis
-* ▶️ **VCS + Verdi** – Simulation and waveform debugging
-* 📦 **TSMC 65nm Standard Cell Library** – Cell mapping and synthesis
+* **Design Compiler (DC Shell)** – RTL synthesis and scan insertion
+* **TetraMAX** – Transition Delay ATPG pattern generation
+* **VCS** – Gate-level simulation
+* **Verdi** – Waveform and scan chain debugging
+* **TSMC 65nm Standard Cell Library** – Used for synthesis and netlist mapping
 
 ---
 
-## 📘 Project Workflow
+## ✅ Key Results
 
-| Phase                             | Description                                                            |
-| --------------------------------- | ---------------------------------------------------------------------- |
-| **1. RTL Design**                 | Created a synthesizable 16×16 multiplier (`mult16x16.v`)               |
-| **2. Synthesis + Scan Insertion** | Inserted scan chains with `synth_mult16x16.tcl` in DC Shell            |
-| **3. Timing & DFT Constraints**   | Defined using `mult16x16.sdc` and scan protocol `.spf`                 |
-| **4. ATPG**                       | Performed transition fault pattern generation in TetraMAX (`atpg.tcl`) |
-| **5. Simulation**                 | Simulated scan patterns in VCS; verified behavior in Verdi             |
-| **6. Analysis**                   | Achieved 100% transition fault coverage with 106 patterns              |
+* **Total Transition Faults:** 5694
+* **Detected Faults:** 5694
+* **Untestable Faults:** 0
+* **ATPG Patterns Generated:** 106
+* **Fault Coverage:** ✅ 100.00%
 
 ---
 
-## ✅ ATPG Results
+## 🏗️ Workflow Overview
 
-* **Fault Model**: Transition (slow-to-rise/fall)
-* **Total Transition Faults**: 5694
-* **Detected Faults**: 5694
-* **Untestable Faults**: 0
-* **ATPG Patterns Generated**: 106
-* **Fault Coverage**: 🟢 **100.00%**
+### 1. RTL Design and Scan Insertion
 
----
+* Designed a 16×16 multiplier in Verilog
+* Synthesized using Design Compiler
+* Scan chains inserted during synthesis
 
-## 📂 Project Structure
+### 2. Transition Fault ATPG
 
-```
-transition-delay-fault-atpg/
-├── mult16x16.v                    # RTL source code
-├── mult16x16_scan.v               # Synthesized + scan-inserted netlist
-├── mult16x16.sdc                  # Timing constraints
-├── mult16x16.spf                  # Scan protocol
-├── synth_mult16x16.tcl            # DC Shell synthesis + DFT script
-├── atpg.tcl                       # TetraMAX ATPG script
-├── mult16x16_delay_patterns.stil  # Generated ATPG patterns
-├── testbench.v                    # VCS-compatible testbench for simulation
-├── report/
-│   ├── fault_coverage.rpt
-│   ├── patterns.rpt
-│   └── untestable.rpt
-├── waveform/
-│   └── screenshot.png             # Waveform captured in Verdi
-└── README.md
-```
+* Used TetraMAX for Transition Delay ATPG
+* Generated 106 launch-capture test patterns
 
----
+### 3. Timing-Aware Simulation (SDF)
 
-## 🗈️ Waveform Snapshot
-
-> Scan patterns and DUT activity verified using Verdi
-
-![Waveform](waveform/screenshot.png)
-
----
-
-## ▶️ How to Run
+* Exported SDF from Design Compiler: `time_1.sdf`
+* Annotated delays on DUT using:
 
 ```bash
-# Compile using VCS
-vcs -V -R <testbench_filename> <netlist_filename> -debug_all -v /home/synopsys/TSMCHOME/digital/Front_End/verilog/tcbn65gplushpbwp_140a/tcbn65gplushpbwp.v -full64 -kdb -0 -gui
-
-# View waveforms in Verdi or DVE
+-sdf max:mult16x16_test.dut:time_1.sdf
 ```
 
+* Simulated using VCS:
+
+```bash
+vcs -V -top mult16x16_test -R \
+  mult16x16_testbench.v mult16x16_scan.v \
+  -debug_all \
+  -sdf max:mult16x16_test.dut:time_1.sdf \
+  -v /path/to/tsmc65nm_std_cells.v \
+  -full64 -kdb -gui +neg_tchk +sdfverbose
+```
+
+* Analyzed propagation delay and scan path via waveform in Verdi
+
+### 4. Functional and Timing Validation
+
+* Verified output `y` against input `a` and `b` under real delays
+* Observed scan shifting and transition propagation
+* Demonstrated proper delay annotation and transition detection behavior
+
 ---
 
-## ✍️ Author
+## 📁 Project Files
 
-* 👤 **Nandagopan KM**
-* 🎓 M.Tech VLSI Design, VIT Vellore
-* 📧 [nandagopankm111@gmail.com](mailto:nandagopankm111@gmail.com)
+* `mult16x16_scan.v` – Gate-level netlist with scan insertion
+* `mult16x16_testbench.v` – Testbench with scan stimulus
+* `time_1.sdf` – Standard Delay Format file with annotated cell delays
+* `*.pattern` – Generated ATPG vectors
 
 ---
 
-## 📄 License
+## 📷 Screenshots
 
-This project is for academic and educational use only.
-You may adapt or reuse it with appropriate credit.
-Consider applying an open-source license like [MIT License](https://choosealicense.com/licenses/mit/).
+Waveform results showing annotated propagation delay and fault simulation.
+
+---
+
+## 📝 Author
+
+Nandagopan KM – M.Tech VLSI Design – VIT Vellore
+
+🔗 [LinkedIn](https://www.linkedin.com/in/nandagopankm/) | 📫 [nandagopankm111@gmail.com](mailto:nandagopankm111@gmail.com)
