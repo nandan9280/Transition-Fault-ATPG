@@ -1,4 +1,4 @@
-# 🧺asdf Transition Delay Fault ATPG on 16×16 Multiplier
+# 🧪 Transition Delay Fault ATPG on 16×16 Multiplier
 
 This repository presents a complete flow of **DFT scan insertion**, **transition delay fault ATPG**, and **simulation validation** for a 16×16 unsigned multiplier using **Synopsys DC Shell, TetraMAX, and VCS**. The project demonstrates how to achieve full transition fault coverage and waveform verification through industry-standard EDA tools.
 
