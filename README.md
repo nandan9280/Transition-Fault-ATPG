@@ -72,9 +72,7 @@ transition-delay-fault-atpg/
 
 ```bash
 # Compile using VCS
-vcs -full64 -debug_all testbench.v mult16x16_scan.v \
-    -v /path/to/tcbn65gplushpbwp.v \
-    -R -gui
+vcs -V -R <testbench_filename> <netlist_filename> -debug_all -v /home/synopsys/TSMCHOME/digital/Front_End/verilog/tcbn65gplushpbwp_140a/tcbn65gplushpbwp.v -full64 -kdb -0 -gui
 
 # View waveforms in Verdi or DVE
 ```
